@@ -197,7 +197,7 @@ class MailSender(threading.Thread):
                     except KeyError:
                         continue
 
-            if keep_alive >= 10:
+            if keep_alive < 0:
                 try:
                     origin = '{}/{}'.format('alerta-mailer',
                                             OPTIONS['smtp_host'])
