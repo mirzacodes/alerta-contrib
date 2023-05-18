@@ -130,6 +130,8 @@ class FanoutConsumer(ConsumerMixin):
         LOG.debug('Alert received from the queue (id: %s)', alertid)
         if alert.repeat:
             LOG.debug('Ignored alert %s: repeat state', alertid)
+            if alertid == "1269ad19-5a79-44f1-b3c2-621cabf059d2":
+                LOG.debug('Special alert %s: details', alert)
             message.ack()
             return
 
