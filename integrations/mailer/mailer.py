@@ -209,6 +209,7 @@ class MailSender(threading.Thread):
                     continue
                 keep_alive = 0
             #keep_alive += 1
+            print("Working")
             time.sleep(2)
 
     def _rule_matches(self, regex, value):
