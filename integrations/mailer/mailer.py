@@ -32,6 +32,7 @@ try:
     import dns.resolver
     DNS_RESOLVER_AVAILABLE = True
 except Exception:
+    print("Exception 20")
     sys.stdout.write('Python dns.resolver unavailable. The skip_mta option will be forced to False\n')  # nopep8
 
 
@@ -124,6 +125,7 @@ class FanoutConsumer(ConsumerMixin):
             alert = Alert.parse(body)
             alertid = alert.get_id()
         except Exception as e:
+            print("Exception 4")
             LOG.warn(e)
             return
 
@@ -151,6 +153,7 @@ class FanoutConsumer(ConsumerMixin):
                 try:
                     del on_hold[alertid]
                 except KeyError:
+                    print("Exception 6")
                     pass
                 message.ack()
             else:
@@ -191,12 +194,14 @@ class MailSender(threading.Thread):
                 try:
                     (alert, hold_time) = on_hold[alertid]
                 except KeyError:
+                    print("Exception 1")
                     continue
                 if time.time() > hold_time:
                     self.send_email(alert)
                     try:
                         del on_hold[alertid]
                     except KeyError:
+                        print("Exception 2")
                         continue
 
             if keep_alive < 0:
@@ -205,6 +210,7 @@ class MailSender(threading.Thread):
                                             OPTIONS['smtp_host'])
                     api.heartbeat(origin, tags=[__version__])
                 except Exception:
+                    print("Exception 3")
                     time.sleep(5)
                     continue
                 keep_alive = 0
@@ -312,14 +318,17 @@ class MailSender(threading.Thread):
                                                      ','.join(contacts)))
             return (msg, contacts)
         except smtplib.SMTPException as e:
+            print("Exception 7")
             LOG.error('Failed to send mail to %s on %s:%s : %s',
                       ', '.join(contacts),
                       OPTIONS['smtp_host'], OPTIONS['smtp_port'], e)
             return None
         except (OSError, socket.herror, socket.gaierror) as e:
+            print("Exception 8")
             LOG.error('Mail server connection error: %s', e)
             return None
         except Exception as e:
+            print("Exception 9")
             LOG.error('Unexpected error while sending email: {}'.format(str(e)))  # nopep8
             return None
 
@@ -351,6 +360,7 @@ class MailSender(threading.Thread):
                     mx.close()
                     LOG.debug('Sent notification email to {} (mta={})'.format(dest, mxhost))  # nopep8
                 except Exception as e:
+                    print("Exception 10")
                     LOG.error('Failed to send email to address {} (mta={}): {}'.format(dest, mxhost, str(e)))  # nopep8
 
         else:
@@ -415,6 +425,7 @@ def validate_rules(rules):
             try:
                 re.compile(field['regex'])
             except re.error:
+                print("Exception 11")
                 LOG.warning('Invalid rule %s, regex %s is not legal',
                             rule, field['regex'])
                 valid = False
@@ -441,6 +452,7 @@ def parse_group_rules(config_file):
                         if rules is not None:
                             rules_d.extend(rules)
                 except Exception:
+                    print("Exception 12")
                     LOG.exception('Could not parse file')
         return rules_d
     return ()
@@ -478,6 +490,7 @@ def main():
         else:
             config.read(os.path.expanduser(config_file))
     except Exception:
+        print("Exception 13")
         LOG.warning('Problem reading configuration file %s - is this an ini file?', config_file)  # nopep8
         sys.exit(1)
 
@@ -524,8 +537,10 @@ def main():
         mailer = MailSender()
         mailer.start()
     except (SystemExit, KeyboardInterrupt):
+        print("Exception 14")
         sys.exit(0)
     except Exception as e:
+        print("Exception 15")
         print(str(e))
         sys.exit(1)
 
@@ -538,10 +553,12 @@ def main():
             consumer = FanoutConsumer(connection=conn)
             consumer.run()
         except (SystemExit, KeyboardInterrupt):
+            print("Exception 16")
             mailer.should_stop = True
             mailer.join()
             sys.exit(0)
         except Exception as e:
+            print("Exception 17")
             print(str(e))
             sys.exit(1)
 
