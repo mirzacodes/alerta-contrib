@@ -211,11 +211,11 @@ class MailSender(threading.Thread):
                     api.heartbeat(origin, tags=[__version__])
                 except Exception:
                     print("Exception 3")
-                    time.sleep(5)
+                    #time.sleep(5)
                     continue
                 keep_alive = 0
             #keep_alive += 1
-            time.sleep(2)
+            #time.sleep(2)
 
     def _rule_matches(self, regex, value):
         '''Checks if a rule matches the regex to
